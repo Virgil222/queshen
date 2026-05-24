@@ -21,6 +21,7 @@ const elements = {
   playerList: document.querySelector("#playerList"),
   matchForm: document.querySelector("#matchForm"),
   matchDate: document.querySelector("#matchDate"),
+  participantEntry: document.querySelector("#participantEntry"),
   scoreEntry: document.querySelector("#scoreEntry"),
   balanceTip: document.querySelector("#balanceTip"),
   quickFillButton: document.querySelector("#quickFillButton"),
@@ -84,8 +85,12 @@ elements.playerForm.addEventListener("submit", async (event) => {
 elements.matchForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const scores = getScoreInputs();
-  if (state.players.length < 2) {
-    alert("至少需要 2 位玩家。");
+  if (state.players.length < 4) {
+    alert("至少需要 4 位玩家。");
+    return;
+  }
+  if (scores.length !== 4) {
+    alert("每局必须选择 4 名参与玩家。");
     return;
   }
   if (scores.every((score) => score.amount === 0)) {
@@ -115,6 +120,18 @@ elements.quickFillButton.addEventListener("click", () => {
   if (inputs.length < 2) return;
   const firstValues = inputs.slice(0, -1).map((input) => toNumber(input.value));
   inputs.at(-1).value = -sum(firstValues);
+  updateBalanceTip();
+});
+
+elements.participantEntry.addEventListener("change", (event) => {
+  if (!event.target.matches("input[type='checkbox']")) return;
+  const selectedCount = getSelectedParticipantIds().length;
+  if (selectedCount > 4) {
+    event.target.checked = false;
+    alert("每局最多只能选择 4 名玩家。");
+    return;
+  }
+  renderScoreInputs();
   updateBalanceTip();
 });
 
@@ -301,6 +318,7 @@ function closeModals() {
 function render() {
   const stats = buildStats();
   renderPlayers();
+  renderParticipants();
   renderScoreInputs();
   renderSummary(stats);
   renderLeaderboard(stats);
@@ -342,18 +360,42 @@ async function removePlayer(playerId) {
   await persistAndRender();
 }
 
+function renderParticipants() {
+  const selectedIds = getSelectedParticipantIds();
+  const defaultIds = selectedIds.length ? selectedIds : state.players.slice(0, 4).map((player) => player.id);
+  elements.participantEntry.innerHTML = "";
+
+  if (state.players.length < 4) {
+    elements.participantEntry.append(emptyState("玩家不足", "至少添加 4 位玩家后才能录入牌局。"));
+    return;
+  }
+
+  state.players.forEach((player) => {
+    const label = document.createElement("label");
+    label.className = "participant-chip";
+    label.innerHTML = `
+      <input type="checkbox" value="${player.id}" ${defaultIds.includes(player.id) ? "checked" : ""} />
+      <span>${escapeHtml(player.name)}</span>
+    `;
+    elements.participantEntry.append(label);
+  });
+}
+
 function renderScoreInputs() {
   const existingValues = Object.fromEntries(
     [...elements.scoreEntry.querySelectorAll("input")].map((input) => [input.dataset.playerId, input.value])
   );
   elements.scoreEntry.innerHTML = "";
 
-  if (!state.players.length) {
-    elements.scoreEntry.append(emptyState("暂无玩家", "先添加玩家后再录入分数。"));
+  const selectedIds = getSelectedParticipantIds();
+  if (selectedIds.length !== 4) {
+    elements.scoreEntry.append(emptyState("请选择 4 位玩家", "选择完成后再录入本局输赢。"));
     return;
   }
 
-  state.players.forEach((player) => {
+  state.players
+    .filter((player) => selectedIds.includes(player.id))
+    .forEach((player) => {
     const row = document.createElement("label");
     row.className = "score-row";
     row.innerHTML = `
@@ -361,7 +403,7 @@ function renderScoreInputs() {
       <input type="number" step="1" value="${existingValues[player.id] ?? 0}" data-player-id="${player.id}" />
     `;
     elements.scoreEntry.append(row);
-  });
+    });
 }
 
 function renderSummary(stats) {
@@ -516,11 +558,10 @@ function renderMatches() {
   orderedMatches.forEach((match) => {
     const card = document.createElement("article");
     card.className = "match-card";
-    const scores = [...match.scores].sort((a, b) => b.amount - a.amount);
+    const scores = [...match.scores].sort((a, b) => b.amount - a.amount).slice(0, 4);
     card.innerHTML = `
       <div class="match-date">
         <strong>${formatDate(match.date)}</strong>
-        <span>${escapeHtml(match.note || "普通牌局")}</span>
       </div>
       <div class="match-scores">
         ${scores
@@ -607,6 +648,10 @@ function getScoreInputs() {
     playerId: input.dataset.playerId,
     amount: toNumber(input.value),
   }));
+}
+
+function getSelectedParticipantIds() {
+  return [...elements.participantEntry.querySelectorAll("input[type='checkbox']:checked")].map((input) => input.value);
 }
 
 function resetScoreInputs() {

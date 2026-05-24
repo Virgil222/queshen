@@ -322,6 +322,39 @@ label {
   font-weight: 700;
 }
 
+.form-label {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.participant-entry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.participant-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.72);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.participant-chip input {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  accent-color: var(--primary);
+}
+
 .score-entry {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -713,8 +746,23 @@ canvas {
   }
 
   .balance-tip,
-  label {
+  label,
+  .form-label {
     font-size: 12px;
+  }
+
+  .participant-entry {
+    gap: 6px;
+  }
+
+  .participant-chip {
+    padding: 7px 9px;
+    font-size: 12px;
+  }
+
+  .participant-chip input {
+    width: 14px;
+    height: 14px;
   }
 
   table {
