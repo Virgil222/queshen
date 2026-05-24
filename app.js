@@ -65,6 +65,11 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeModals();
 });
 
+window.addEventListener("resize", () => {
+  clearTimeout(window.__trendResizeTimer);
+  window.__trendResizeTimer = setTimeout(() => renderTrendChart(), 120);
+});
+
 elements.playerForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const name = elements.playerName.value.trim();
@@ -442,9 +447,7 @@ function renderTopPlayer(stats) {
 
 function renderTrendChart() {
   const canvas = elements.trendChart;
-  const ctx = canvas.getContext("2d");
-  const width = canvas.width;
-  const height = canvas.height;
+  const { ctx, width, height } = setupTrendCanvas(canvas);
   ctx.clearRect(0, 0, width, height);
 
   if (!state.matches.length || !state.players.length) {
@@ -452,7 +455,7 @@ function renderTrendChart() {
     return;
   }
 
-  const padding = { top: 30, right: 24, bottom: 70, left: 62 };
+  const padding = { top: 34, right: 82, bottom: 76, left: 64 };
   const series = buildTrendSeries();
   const trendDates = getTrendDates();
   const allValues = series.flatMap((item) => item.points.map((point) => point.value));
@@ -462,10 +465,10 @@ function renderTrendChart() {
   const plotWidth = width - padding.left - padding.right;
   const plotHeight = height - padding.top - padding.bottom;
 
-  ctx.strokeStyle = "rgba(92, 63, 42, 0.12)";
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = "rgba(92, 63, 42, 0.16)";
+  ctx.lineWidth = 1.2;
   ctx.fillStyle = "#7a6a5c";
-  ctx.font = "13px sans-serif";
+  ctx.font = "600 13px sans-serif";
 
   for (let i = 0; i <= 4; i++) {
     const y = padding.top + (plotHeight / 4) * i;
@@ -477,18 +480,43 @@ function renderTrendChart() {
     ctx.fillText(formatMoney(Math.round(value)), 10, y + 4);
   }
 
+  const zeroY = padding.top + plotHeight - ((0 - minValue) / range) * plotHeight;
+  ctx.strokeStyle = "rgba(189, 47, 47, 0.28)";
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.moveTo(padding.left, zeroY);
+  ctx.lineTo(width - padding.right, zeroY);
+  ctx.stroke();
+
+  ctx.strokeStyle = "rgba(92, 63, 42, 0.28)";
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.moveTo(padding.left, padding.top);
+  ctx.lineTo(padding.left, padding.top + plotHeight);
+  ctx.lineTo(width - padding.right, padding.top + plotHeight);
+  ctx.stroke();
+
   ctx.textAlign = "center";
   ctx.fillStyle = "#7a6a5c";
-  ctx.font = "12px sans-serif";
+  ctx.font = "600 12px sans-serif";
   getAxisDateLabels(trendDates).forEach(({ date, pointIndex }) => {
     const x = padding.left + (plotWidth / Math.max(1, trendDates.length)) * pointIndex;
+    ctx.strokeStyle = "rgba(92, 63, 42, 0.12)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, padding.top);
+    ctx.lineTo(x, padding.top + plotHeight + 5);
+    ctx.stroke();
     ctx.fillText(formatAxisDate(date), x, height - 22);
   });
   ctx.textAlign = "left";
 
   series.forEach((item, index) => {
-    ctx.strokeStyle = colors[index % colors.length];
-    ctx.lineWidth = 3;
+    const color = colors[index % colors.length];
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3.4;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
     ctx.beginPath();
     item.points.forEach((point, pointIndex) => {
       const x = padding.left + (plotWidth / Math.max(1, item.points.length - 1)) * pointIndex;
@@ -498,15 +526,29 @@ function renderTrendChart() {
     });
     ctx.stroke();
 
+    item.points.forEach((point, pointIndex) => {
+      const x = padding.left + (plotWidth / Math.max(1, item.points.length - 1)) * pointIndex;
+      const y = padding.top + plotHeight - ((point.value - minValue) / range) * plotHeight;
+      ctx.fillStyle = "#fffaf2";
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.arc(x, y, pointIndex === item.points.length - 1 ? 4.2 : 3.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+
     const lastPoint = item.points.at(-1);
     const labelX = padding.left + plotWidth + 8;
     const labelY = padding.top + plotHeight - ((lastPoint.value - minValue) / range) * plotHeight;
-    ctx.fillStyle = colors[index % colors.length];
+    ctx.fillStyle = color;
+    ctx.font = "700 12px sans-serif";
     ctx.fillText(item.name, Math.min(labelX, width - 58), labelY + 4);
   });
 
   ctx.fillStyle = "#7a6a5c";
-  ctx.fillText("数值为累计输赢", padding.left, height - 44);
+  ctx.font = "600 12px sans-serif";
+  ctx.fillText("数值为累计输赢", padding.left, height - 48);
 }
 
 function renderMatches() {
@@ -673,6 +715,18 @@ function drawEmptyCanvas(ctx, width, height, text) {
   ctx.textAlign = "center";
   ctx.fillText(text, width / 2, height / 2);
   ctx.textAlign = "left";
+}
+
+function setupTrendCanvas(canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const width = Math.max(320, rect.width || canvas.clientWidth || 900);
+  const height = Math.max(260, rect.height || canvas.clientHeight || 420);
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, width, height };
 }
 
 function sum(values) {
