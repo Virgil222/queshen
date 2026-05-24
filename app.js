@@ -408,7 +408,7 @@ function renderSummary(stats) {
 function renderLeaderboard(stats) {
   elements.leaderboardBody.innerHTML = "";
   if (!stats.length) {
-    elements.leaderboardBody.innerHTML = `<tr><td colspan="9">${emptyStateHtml("还没有排行", "录入牌局后自动生成排行榜。")}</td></tr>`;
+    elements.leaderboardBody.innerHTML = `<tr><td colspan="11">${emptyStateHtml("还没有排行", "录入牌局后自动生成排行榜。")}</td></tr>`;
     return;
   }
 
@@ -420,6 +420,8 @@ function renderLeaderboard(stats) {
       <td class="${amountClass(item.total)}">${formatMoney(item.total)}</td>
       <td>${formatPercent(item.winRate)}</td>
       <td>${item.games}</td>
+      <td>${item.wins}</td>
+      <td>${item.losses}</td>
       <td>${item.champions}</td>
       <td class="${amountClass(item.best)}">${formatMoney(item.best)}</td>
       <td class="${amountClass(item.worst)}">${formatMoney(item.worst)}</td>
@@ -600,6 +602,7 @@ function buildStats() {
         name: player.name,
         total: 0,
         wins: 0,
+        losses: 0,
         games: 0,
         champions: 0,
         best: 0,
@@ -619,6 +622,7 @@ function buildStats() {
       item.total += score.amount;
       item.games += 1;
       item.wins += score.amount > 0 ? 1 : 0;
+      item.losses += score.amount < 0 ? 1 : 0;
       item.champions += score.amount === maxScore && maxScore > 0 ? 1 : 0;
       item.best = Math.max(item.best, score.amount);
       item.worst = item.games === 1 ? score.amount : Math.min(item.worst, score.amount);

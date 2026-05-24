@@ -426,7 +426,7 @@ label {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1000px;
+  min-width: 1120px;
 }
 
 th,
@@ -766,7 +766,7 @@ canvas {
   }
 
   table {
-    min-width: 820px;
+    min-width: 940px;
   }
 
   th,
