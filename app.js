@@ -558,7 +558,7 @@ function renderMatches() {
   orderedMatches.forEach((match) => {
     const card = document.createElement("article");
     card.className = "match-card";
-    const scores = [...match.scores].sort((a, b) => b.amount - a.amount).slice(0, 4);
+    const scores = getParticipantScores(match).sort((a, b) => b.amount - a.amount);
     card.innerHTML = `
       <div class="match-date">
         <strong>${formatDate(match.date)}</strong>
@@ -607,8 +607,9 @@ function buildStats() {
   );
 
   state.matches.forEach((match) => {
-    const maxScore = Math.max(...match.scores.map((score) => score.amount));
-    match.scores.forEach((score) => {
+    const participantScores = getParticipantScores(match);
+    const maxScore = Math.max(...participantScores.map((score) => score.amount));
+    participantScores.forEach((score) => {
       const item = statsMap.get(score.playerId);
       if (!item) return;
       item.total += score.amount;
@@ -652,6 +653,12 @@ function getScoreInputs() {
 
 function getSelectedParticipantIds() {
   return [...elements.participantEntry.querySelectorAll("input[type='checkbox']:checked")].map((input) => input.value);
+}
+
+function getParticipantScores(match) {
+  if (match.scores.length <= 4) return [...match.scores];
+  const nonZeroScores = match.scores.filter((score) => score.amount !== 0);
+  return nonZeroScores.length >= 4 ? nonZeroScores.slice(0, 4) : match.scores.slice(0, 4);
 }
 
 function resetScoreInputs() {
