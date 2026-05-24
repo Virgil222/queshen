@@ -45,15 +45,12 @@ const elements = {
 elements.matchDate.valueAsDate = new Date();
 
 elements.openPlayerModal.addEventListener("click", () => {
-  const password = prompt("请输入玩家管理密码");
-  if (password !== PLAYER_ADMIN_PASSWORD) {
-    alert("密码错误，无法进入玩家管理。");
-    return;
-  }
+  if (!requireAdminPassword("玩家管理")) return;
   openModal(elements.playerModal);
 });
 
 elements.openMatchModal.addEventListener("click", () => {
+  if (!requireAdminPassword("录入牌局")) return;
   openModal(elements.matchModal);
 });
 
@@ -280,6 +277,13 @@ function normalizeCloudConfig(config) {
 function setSyncStatus(message, isError = false) {
   elements.syncStatus.textContent = message;
   elements.syncStatus.classList.toggle("error", isError);
+}
+
+function requireAdminPassword(actionName) {
+  const password = prompt(`请输入${actionName}密码`);
+  if (password === PLAYER_ADMIN_PASSWORD) return true;
+  alert("密码错误，无法继续操作。");
+  return false;
 }
 
 function openModal(modal) {
@@ -584,6 +588,7 @@ function renderMatches() {
     deleteButton.className = "delete-match";
     deleteButton.textContent = "删除";
     deleteButton.addEventListener("click", async () => {
+      if (!requireAdminPassword("删除牌局")) return;
       if (!confirm("删除这场牌局记录吗？")) return;
       state.matches = state.matches.filter((item) => item.id !== match.id);
       await persistAndRender();
