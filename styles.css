@@ -589,8 +589,7 @@ canvas {
   .hero,
   .charts-grid,
   .form-grid,
-  .score-entry,
-  .match-card {
+  .score-entry {
     grid-template-columns: 1fr;
   }
 
@@ -805,18 +804,25 @@ canvas {
   }
 
   .match-card {
-    gap: 10px;
-    padding: 12px;
-    border-radius: 14px;
+    grid-template-columns: 74px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 9px;
+    border-radius: 12px;
   }
 
   .match-date strong {
-    font-size: 15px;
+    font-size: 13px;
+  }
+
+  .delete-match {
+    align-self: center;
+    padding: 5px 8px;
+    font-size: 12px;
   }
 
   .score-pill {
-    padding: 5px 8px;
-    font-size: 12px;
+    padding: 4px 6px;
+    font-size: 11px;
   }
 
   .empty-state {

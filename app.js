@@ -387,13 +387,13 @@ function renderScoreInputs() {
 function renderSummary(stats) {
   const totalNet = sum(stats.map((item) => item.total));
   const totalRounds = state.matches.length;
-  const totalPlayers = state.players.length;
   const biggestWin = stats.length ? Math.max(...stats.map((item) => item.best)) : 0;
+  const biggestLoss = stats.length ? Math.min(...stats.map((item) => item.worst)) : 0;
   const cards = [
-    ["玩家数", `${totalPlayers} 位`],
     ["牌局数", `${totalRounds} 场`],
     ["累计流水", formatMoney(state.matches.reduce((acc, match) => acc + sum(match.scores.map((score) => Math.abs(score.amount))), 0) / 2)],
     ["最佳单局", formatMoney(biggestWin)],
+    ["最差单局", formatMoney(biggestLoss)],
   ];
 
   elements.summaryCards.innerHTML = cards
