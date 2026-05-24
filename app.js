@@ -512,7 +512,8 @@ function renderMatches() {
     return;
   }
 
-  state.matches.forEach((match) => {
+  const orderedMatches = [...state.matches].sort((a, b) => getMatchTime(b) - getMatchTime(a));
+  orderedMatches.forEach((match) => {
     const card = document.createElement("article");
     card.className = "match-card";
     const scores = [...match.scores].sort((a, b) => b.amount - a.amount);
@@ -670,6 +671,10 @@ function amountClass(value) {
 function formatDate(value) {
   if (!value) return "未填写日期";
   return new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit", weekday: "short" }).format(new Date(value));
+}
+
+function getMatchTime(match) {
+  return new Date(match.createdAt || match.date || 0).getTime();
 }
 
 function escapeHtml(value) {
