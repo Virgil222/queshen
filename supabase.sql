@@ -6,6 +6,9 @@ create table if not exists public.queshen_state (
 
 alter table public.queshen_state enable row level security;
 
+grant usage on schema public to anon;
+grant select, insert, update on public.queshen_state to anon;
+
 drop policy if exists "allow public read queshen state" on public.queshen_state;
 create policy "allow public read queshen state"
 on public.queshen_state

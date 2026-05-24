@@ -201,7 +201,7 @@ async function loadCloudState() {
     headers: getSupabaseHeaders(),
   });
   if (!response.ok) {
-    throw new Error(`读取云端数据失败：${response.status}`);
+    throw new Error(await getCloudErrorMessage(response, "读取云端数据失败"));
   }
 
   const rows = await response.json();
@@ -227,8 +227,16 @@ async function saveCloudState() {
   });
 
   if (!response.ok) {
-    throw new Error(`保存云端数据失败：${response.status}`);
+    throw new Error(await getCloudErrorMessage(response, "保存云端数据失败"));
   }
+}
+
+async function getCloudErrorMessage(response, fallback) {
+  const details = await response.text();
+  if (details.includes("PGRST205") || details.includes("queshen_state")) {
+    return `${fallback}：未找到云端数据表，请先在 Supabase SQL Editor 执行 supabase.sql`;
+  }
+  return `${fallback}：${response.status}`;
 }
 
 function getSupabaseHeaders() {
