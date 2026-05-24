@@ -549,8 +549,8 @@ canvas {
   }
 
   .app-shell {
-    width: min(100% - 28px, 720px);
-    padding-top: 18px;
+    width: min(100% - 20px, 720px);
+    padding: 10px 0 28px;
   }
 
   .hero,
@@ -564,28 +564,237 @@ canvas {
   }
 
   .hero {
-    padding: 24px;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 22px;
   }
 
   h1 {
-    font-size: 48px;
+    font-size: 38px;
+    line-height: 1.05;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
+  .eyebrow,
+  .section-kicker {
+    margin-bottom: 5px;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+
+  .hero-card {
+    min-height: auto;
+    gap: 10px;
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .hero-rank-item + .hero-rank-item {
+    padding-top: 10px;
+  }
+
+  .hero-card strong {
+    margin: 6px 0 3px;
+    font-size: 24px;
+  }
+
+  .hero-card span,
+  .hero-card small {
+    font-size: 12px;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 12px 0;
+  }
+
+  .summary-card {
+    padding: 13px;
+    border-radius: 16px;
+  }
+
+  .summary-card span {
+    font-size: 12px;
+  }
+
+  .summary-card strong {
+    margin-top: 6px;
+    font-size: 22px;
+  }
+
+  .action-panel {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .action-button {
+    min-height: 72px;
+    padding: 14px;
+    border-radius: 18px;
+    font-size: 20px;
+  }
+
+  .action-button span {
+    font-size: 10px;
   }
 
   .panel-header,
   .inline-form {
     flex-direction: column;
+    gap: 10px;
+  }
+
+  .panel-header {
+    margin-bottom: 12px;
+  }
+
+  .panel {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  input,
+  button,
+  .ghost-button,
+  .danger-button {
+    min-height: 40px;
+    border-radius: 12px;
+  }
+
+  input {
+    height: 40px;
+    padding: 0 12px;
+  }
+
+  .toolbar {
+    gap: 8px;
+  }
+
+  .sync-status {
+    min-height: 32px;
+    font-size: 12px;
   }
 
   .modal {
     align-items: start;
-    padding: 14px;
+    padding: 10px;
   }
 
   .modal-card {
-    max-height: calc(100vh - 28px);
+    max-height: calc(100vh - 20px);
+  }
+
+  .match-form {
+    gap: 12px;
+  }
+
+  .form-grid.single {
+    grid-template-columns: 1fr;
+  }
+
+  .score-entry {
+    gap: 8px;
+  }
+
+  .score-row {
+    grid-template-columns: 1fr 104px;
+    gap: 8px;
+    padding: 9px;
+    border-radius: 14px;
+  }
+
+  .balance-tip,
+  label {
+    font-size: 12px;
+  }
+
+  table {
+    min-width: 820px;
+  }
+
+  th,
+  td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .rank-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+  }
+
+  .charts-grid {
+    gap: 12px;
+    margin: 12px 0;
+  }
+
+  canvas {
+    max-height: 240px;
+  }
+
+  .bar-chart {
+    gap: 10px;
+  }
+
+  .bar-row {
+    grid-template-columns: 74px 1fr 70px;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .match-list {
+    gap: 8px;
+  }
+
+  .match-card {
+    gap: 10px;
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .match-date strong {
+    font-size: 15px;
+  }
+
+  .score-pill {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .empty-state {
+    padding: 16px;
+    border-radius: 14px;
   }
 
   .toolbar {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-shell {
+    width: min(100% - 14px, 420px);
+  }
+
+  h1 {
+    font-size: 34px;
+  }
+
+  .summary-card strong {
+    font-size: 20px;
+  }
+
+  .action-button {
+    min-height: 64px;
+    font-size: 18px;
+  }
+
+  .panel {
+    padding: 12px;
   }
 }
