@@ -554,7 +554,7 @@ function renderMatches() {
     return;
   }
 
-  const orderedMatches = [...state.matches].sort((a, b) => getMatchTime(b) - getMatchTime(a));
+  const orderedMatches = [...state.matches].sort((a, b) => getMatchSortTime(b) - getMatchSortTime(a));
   orderedMatches.forEach((match) => {
     const card = document.createElement("article");
     card.className = "match-card";
@@ -725,8 +725,10 @@ function formatDate(value) {
   return new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit", weekday: "short" }).format(new Date(value));
 }
 
-function getMatchTime(match) {
-  return new Date(match.createdAt || match.date || 0).getTime();
+function getMatchSortTime(match) {
+  const dateTime = match.date ? new Date(`${match.date}T00:00:00`).getTime() : 0;
+  const createdTime = match.createdAt ? new Date(match.createdAt).getTime() : 0;
+  return dateTime || createdTime;
 }
 
 function escapeHtml(value) {
