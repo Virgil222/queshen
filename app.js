@@ -100,7 +100,7 @@ elements.matchForm.addEventListener("submit", async (event) => {
     return;
   }
   if (sum(scores.map((score) => score.amount)) !== 0) {
-    alert("本局所有人的输赢合计必须等于 0。");
+    alert("本局所有人的积分合计必须等于 0。");
     return;
   }
 
@@ -367,7 +367,7 @@ function renderScoreInputs() {
 
   const selectedIds = getSelectedParticipantIds();
   if (selectedIds.length !== 4) {
-    elements.scoreEntry.append(emptyState("请选择 4 位玩家", "选择完成后再录入本局输赢。"));
+    elements.scoreEntry.append(emptyState("请选择 4 位玩家", "选择完成后再录入本局积分。"));
     return;
   }
 
@@ -391,7 +391,7 @@ function renderSummary(stats) {
   const biggestLoss = stats.length ? Math.min(...stats.map((item) => item.worst)) : 0;
   const cards = [
     ["牌局数", `${totalRounds} 场`],
-    ["累计流水", formatMoney(state.matches.reduce((acc, match) => acc + sum(match.scores.map((score) => Math.abs(score.amount))), 0) / 2)],
+    ["累计积分", formatMoney(state.matches.reduce((acc, match) => acc + sum(match.scores.map((score) => Math.abs(score.amount))), 0) / 2)],
     ["最佳单局", formatMoney(biggestWin)],
     ["最差单局", formatMoney(biggestLoss)],
   ];
@@ -439,11 +439,11 @@ function renderTopPlayer(stats) {
     .sort((a, b) => a.total - b.total || a.winRate - b.winRate || a.champions - b.champions)[0];
   elements.topPlayerName.textContent = top ? top.name : "暂无数据";
   elements.topPlayerMeta.textContent = top
-    ? `总输赢 ${formatMoney(top.total)} · 胜率 ${formatPercent(top.winRate)}`
+    ? `总积分 ${formatMoney(top.total)} · 胜率 ${formatPercent(top.winRate)}`
     : "录入一场牌局后生成";
   elements.lowPlayerName.textContent = low ? low.name : "暂无数据";
   elements.lowPlayerMeta.textContent = low
-    ? `总输赢 ${formatMoney(low.total)} · 胜率 ${formatPercent(low.winRate)}`
+    ? `总积分 ${formatMoney(low.total)} · 胜率 ${formatPercent(low.winRate)}`
     : "录入一场牌局后生成";
 }
 
@@ -550,7 +550,7 @@ function renderTrendChart() {
 
   ctx.fillStyle = "#7a6a5c";
   ctx.font = "600 12px sans-serif";
-  ctx.fillText("数值为累计输赢", padding.left, height - 48);
+  ctx.fillText("数值为累计积分", padding.left, height - 48);
 }
 
 function renderMatches() {

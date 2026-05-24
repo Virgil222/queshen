@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>雀神争霸榜</title>
-    <link rel="stylesheet" href="./styles.css?v=20260524-11" />
+    <link rel="stylesheet" href="./styles.css?v=20260524-12" />
   </head>
   <body>
     <main class="app-shell">
@@ -72,7 +72,7 @@
               <div class="participant-entry" id="participantEntry"></div>
             </div>
             <div class="score-entry" id="scoreEntry"></div>
-            <p class="balance-tip" id="balanceTip">总输赢需要等于 0，才是一局完整结算。</p>
+            <p class="balance-tip" id="balanceTip">总积分需要等于 0，才是一局完整结算。</p>
             <button type="submit" class="primary-button">保存牌局</button>
           </form>
         </section>
@@ -95,7 +95,7 @@
               <tr>
                 <th>排名</th>
                 <th>玩家</th>
-                <th>总输赢</th>
+                <th>总积分</th>
                 <th>胜率</th>
                 <th>场次</th>
                 <th>胜局</th>
@@ -103,7 +103,7 @@
                 <th>冠军</th>
                 <th>最佳单局</th>
                 <th>最差单局</th>
-                <th>平均收益</th>
+                <th>平均积分</th>
               </tr>
             </thead>
             <tbody id="leaderboardBody"></tbody>
@@ -146,11 +146,11 @@
     <template id="emptyStateTemplate">
       <div class="empty-state">
         <strong>还没有数据</strong>
-        <span>先添加玩家，再录入每次牌局的输赢。</span>
+        <span>先添加玩家，再录入每次牌局的积分。</span>
       </div>
     </template>
 
-    <script src="./config.js?v=20260524-11"></script>
-    <script src="./app.js?v=20260524-11"></script>
+    <script src="./config.js?v=20260524-12"></script>
+    <script src="./app.js?v=20260524-12"></script>
   </body>
 </html>
