@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>雀神争霸赛</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Mahjong Club Dashboard</p>
+          <h1>雀神争霸赛</h1>
+          <p class="hero-text">
+            记录每场麻将的输赢，自动统计总战绩、胜率、排行和走势，帮你们把“今晚谁最旺”讲清楚。
+          </p>
+        </div>
+        <div class="hero-card">
+          <span>当前雀神</span>
+          <strong id="topPlayerName">暂无数据</strong>
+          <small id="topPlayerMeta">录入一场牌局后生成</small>
+        </div>
+      </section>
+
+      <section class="summary-grid" id="summaryCards"></section>
+
+      <section class="layout">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="section-kicker">Players</p>
+              <h2>玩家管理</h2>
+            </div>
+          </div>
+          <form id="playerForm" class="inline-form">
+            <input id="playerName" type="text" placeholder="输入朋友昵称，例如：阿强" maxlength="12" />
+            <button type="submit">添加玩家</button>
+          </form>
+          <div class="chip-list" id="playerList"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="section-kicker">New Match</p>
+              <h2>录入牌局</h2>
+            </div>
+            <button id="quickFillButton" class="ghost-button" type="button">快速填平</button>
+          </div>
+          <form id="matchForm" class="match-form">
+            <div class="form-grid">
+              <label>
+                日期
+                <input id="matchDate" type="date" />
+              </label>
+              <label>
+                场次备注
+                <input id="matchNote" type="text" placeholder="如：周末局 / 半庄 / 东风" maxlength="30" />
+              </label>
+            </div>
+            <div class="score-entry" id="scoreEntry"></div>
+            <p class="balance-tip" id="balanceTip">总输赢需要等于 0，才是一局完整结算。</p>
+            <button type="submit" class="primary-button">保存牌局</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">Leaderboard</p>
+            <h2>雀友排行榜</h2>
+          </div>
+          <div class="toolbar">
+            <span id="syncStatus" class="sync-status">本地模式</span>
+            <button id="exportButton" class="ghost-button" type="button">导出数据</button>
+            <label class="ghost-button file-button">
+              导入数据
+              <input id="importInput" type="file" accept="application/json" />
+            </label>
+            <button id="resetButton" class="danger-button" type="button">清空数据</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>排名</th>
+                <th>玩家</th>
+                <th>总输赢</th>
+                <th>胜率</th>
+                <th>场次</th>
+                <th>冠军</th>
+                <th>最佳单局</th>
+                <th>平均收益</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="charts-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="section-kicker">Trend</p>
+              <h2>财富走势</h2>
+            </div>
+          </div>
+          <canvas id="trendChart" width="900" height="360"></canvas>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="section-kicker">Distribution</p>
+              <h2>总输赢对比</h2>
+            </div>
+          </div>
+          <div class="bar-chart" id="barChart"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">History</p>
+            <h2>牌局记录</h2>
+          </div>
+        </div>
+        <div class="match-list" id="matchList"></div>
+      </section>
+    </main>
+
+    <template id="emptyStateTemplate">
+      <div class="empty-state">
+        <strong>还没有数据</strong>
+        <span>先添加玩家，再录入每次牌局的输赢。</span>
+      </div>
+    </template>
+
+    <script src="./config.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
