@@ -1,4 +1,5 @@
 const STORAGE_KEY = "queshen-competition-state-v1";
+const PLAYER_ADMIN_PASSWORD = "lwj200021";
 const colors = ["#bd2f2f", "#14795a", "#d39b36", "#5d332d", "#376c95", "#8f4ba8", "#dd7a28", "#299a91"];
 const cloudConfig = normalizeCloudConfig(window.QUESHEN_CONFIG);
 
@@ -20,10 +21,13 @@ const elements = {
   playerList: document.querySelector("#playerList"),
   matchForm: document.querySelector("#matchForm"),
   matchDate: document.querySelector("#matchDate"),
-  matchNote: document.querySelector("#matchNote"),
   scoreEntry: document.querySelector("#scoreEntry"),
   balanceTip: document.querySelector("#balanceTip"),
   quickFillButton: document.querySelector("#quickFillButton"),
+  openPlayerModal: document.querySelector("#openPlayerModal"),
+  openMatchModal: document.querySelector("#openMatchModal"),
+  playerModal: document.querySelector("#playerModal"),
+  matchModal: document.querySelector("#matchModal"),
   summaryCards: document.querySelector("#summaryCards"),
   leaderboardBody: document.querySelector("#leaderboardBody"),
   topPlayerName: document.querySelector("#topPlayerName"),
@@ -41,6 +45,27 @@ const elements = {
 };
 
 elements.matchDate.valueAsDate = new Date();
+
+elements.openPlayerModal.addEventListener("click", () => {
+  const password = prompt("请输入玩家管理密码");
+  if (password !== PLAYER_ADMIN_PASSWORD) {
+    alert("密码错误，无法进入玩家管理。");
+    return;
+  }
+  openModal(elements.playerModal);
+});
+
+elements.openMatchModal.addEventListener("click", () => {
+  openModal(elements.matchModal);
+});
+
+document.querySelectorAll("[data-close-modal]").forEach((button) => {
+  button.addEventListener("click", () => closeModals());
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeModals();
+});
 
 elements.playerForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -75,14 +100,14 @@ elements.matchForm.addEventListener("submit", async (event) => {
   state.matches.unshift({
     id: crypto.randomUUID(),
     date: elements.matchDate.value || new Date().toISOString().slice(0, 10),
-    note: elements.matchNote.value.trim(),
+    note: "",
     scores,
     createdAt: new Date().toISOString(),
   });
 
-  elements.matchNote.value = "";
   resetScoreInputs();
   await persistAndRender();
+  closeModals();
 });
 
 elements.quickFillButton.addEventListener("click", () => {
@@ -261,6 +286,18 @@ function setSyncStatus(message, isError = false) {
   elements.syncStatus.classList.toggle("error", isError);
 }
 
+function openModal(modal) {
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeModals() {
+  [elements.playerModal, elements.matchModal].forEach((modal) => {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  });
+}
+
 function render() {
   const stats = buildStats();
   renderPlayers();
@@ -351,7 +388,7 @@ function renderSummary(stats) {
 function renderLeaderboard(stats) {
   elements.leaderboardBody.innerHTML = "";
   if (!stats.length) {
-    elements.leaderboardBody.innerHTML = `<tr><td colspan="8">${emptyStateHtml("还没有排行", "录入牌局后自动生成排行榜。")}</td></tr>`;
+    elements.leaderboardBody.innerHTML = `<tr><td colspan="9">${emptyStateHtml("还没有排行", "录入牌局后自动生成排行榜。")}</td></tr>`;
     return;
   }
 
@@ -365,6 +402,7 @@ function renderLeaderboard(stats) {
       <td>${item.games}</td>
       <td>${item.champions}</td>
       <td class="${amountClass(item.best)}">${formatMoney(item.best)}</td>
+      <td class="${amountClass(item.worst)}">${formatMoney(item.worst)}</td>
       <td class="${amountClass(item.average)}">${formatMoney(item.average)}</td>
     `;
     elements.leaderboardBody.append(row);
@@ -372,17 +410,18 @@ function renderLeaderboard(stats) {
 }
 
 function renderTopPlayer(stats) {
-  const top = stats[0];
+  const activeStats = stats.filter((item) => item.games > 0);
+  const top = activeStats[0];
   const low = [...stats]
     .filter((item) => item.games > 0)
-    .sort((a, b) => a.winRate - b.winRate || a.total - b.total || a.champions - b.champions)[0];
+    .sort((a, b) => a.total - b.total || a.winRate - b.winRate || a.champions - b.champions)[0];
   elements.topPlayerName.textContent = top ? top.name : "暂无数据";
   elements.topPlayerMeta.textContent = top
     ? `总输赢 ${formatMoney(top.total)} · 胜率 ${formatPercent(top.winRate)}`
     : "录入一场牌局后生成";
   elements.lowPlayerName.textContent = low ? low.name : "暂无数据";
   elements.lowPlayerMeta.textContent = low
-    ? `胜率 ${formatPercent(low.winRate)} · 总输赢 ${formatMoney(low.total)}`
+    ? `总输赢 ${formatMoney(low.total)} · 胜率 ${formatPercent(low.winRate)}`
     : "录入一场牌局后生成";
 }
 
@@ -518,6 +557,7 @@ function buildStats() {
         games: 0,
         champions: 0,
         best: 0,
+        worst: 0,
         average: 0,
         winRate: 0,
       },
@@ -534,6 +574,7 @@ function buildStats() {
       item.wins += score.amount > 0 ? 1 : 0;
       item.champions += score.amount === maxScore && maxScore > 0 ? 1 : 0;
       item.best = Math.max(item.best, score.amount);
+      item.worst = item.games === 1 ? score.amount : Math.min(item.worst, score.amount);
     });
   });
 

@@ -146,11 +146,60 @@ h2 {
   font-size: 30px;
 }
 
-.layout {
+.action-panel {
   display: grid;
-  grid-template-columns: 0.92fr 1.38fr;
-  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
   margin-bottom: 24px;
+}
+
+.action-button {
+  display: grid;
+  min-height: 110px;
+  place-items: center;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: #fff;
+  background: linear-gradient(135deg, rgba(189, 47, 47, 0.96), rgba(93, 51, 45, 0.96));
+  box-shadow: var(--shadow);
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.action-button span {
+  color: rgba(255, 247, 236, 0.72);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: none;
+  place-items: center;
+  padding: 24px;
+}
+
+.modal.open {
+  display: grid;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(34, 24, 19, 0.58);
+  backdrop-filter: blur(6px);
+}
+
+.modal-card {
+  position: relative;
+  z-index: 1;
+  width: min(920px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
+  overflow: auto;
 }
 
 .panel {
@@ -261,6 +310,10 @@ button,
   gap: 14px;
 }
 
+.form-grid.single {
+  grid-template-columns: 180px;
+}
+
 label {
   display: grid;
   gap: 8px;
@@ -340,7 +393,7 @@ label {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 900px;
+  min-width: 1000px;
 }
 
 th,
@@ -501,7 +554,7 @@ canvas {
   }
 
   .hero,
-  .layout,
+  .action-panel,
   .charts-grid,
   .summary-grid,
   .form-grid,
@@ -521,6 +574,15 @@ canvas {
   .panel-header,
   .inline-form {
     flex-direction: column;
+  }
+
+  .modal {
+    align-items: start;
+    padding: 14px;
+  }
+
+  .modal-card {
+    max-height: calc(100vh - 28px);
   }
 
   .toolbar {

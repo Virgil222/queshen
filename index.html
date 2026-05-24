@@ -20,7 +20,7 @@
             <small id="topPlayerMeta">录入一场牌局后生成</small>
           </div>
           <div class="hero-rank-item">
-            <span>当前雀菜</span>
+            <span>当前菜鸟</span>
             <strong id="lowPlayerName">暂无数据</strong>
             <small id="lowPlayerMeta">录入一场牌局后生成</small>
           </div>
@@ -29,52 +29,67 @@
 
       <section class="summary-grid" id="summaryCards"></section>
 
-      <section class="layout">
-        <div class="panel">
+      <section class="action-panel">
+        <button id="openPlayerModal" class="action-button" type="button">
+          <span>Players</span>
+          玩家管理
+        </button>
+        <button id="openMatchModal" class="action-button" type="button">
+          <span>New Match</span>
+          录入牌局
+        </button>
+      </section>
+
+      <div id="playerModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop" data-close-modal></div>
+        <section class="panel modal-card" role="dialog" aria-modal="true" aria-labelledby="playerModalTitle">
           <div class="panel-header">
             <div>
               <p class="section-kicker">Players</p>
-              <h2>玩家管理</h2>
+              <h2 id="playerModalTitle">玩家管理</h2>
             </div>
+            <button class="ghost-button" type="button" data-close-modal>关闭</button>
           </div>
           <form id="playerForm" class="inline-form">
             <input id="playerName" type="text" placeholder="输入朋友昵称，例如：阿强" maxlength="12" />
             <button type="submit">添加玩家</button>
           </form>
           <div class="chip-list" id="playerList"></div>
-        </div>
+        </section>
+      </div>
 
-        <div class="panel">
+      <div id="matchModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop" data-close-modal></div>
+        <section class="panel modal-card" role="dialog" aria-modal="true" aria-labelledby="matchModalTitle">
           <div class="panel-header">
             <div>
               <p class="section-kicker">New Match</p>
-              <h2>录入牌局</h2>
+              <h2 id="matchModalTitle">录入牌局</h2>
             </div>
-            <button id="quickFillButton" class="ghost-button" type="button">快速填平</button>
+            <div class="toolbar">
+              <button id="quickFillButton" class="ghost-button" type="button">快速填平</button>
+              <button class="ghost-button" type="button" data-close-modal>关闭</button>
+            </div>
           </div>
           <form id="matchForm" class="match-form">
-            <div class="form-grid">
+            <div class="form-grid single">
               <label>
                 日期
                 <input id="matchDate" type="date" />
-              </label>
-              <label>
-                场次备注
-                <input id="matchNote" type="text" placeholder="如：周末局 / 半庄 / 东风" maxlength="30" />
               </label>
             </div>
             <div class="score-entry" id="scoreEntry"></div>
             <p class="balance-tip" id="balanceTip">总输赢需要等于 0，才是一局完整结算。</p>
             <button type="submit" class="primary-button">保存牌局</button>
           </form>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <section class="panel">
         <div class="panel-header">
           <div>
             <p class="section-kicker">Leaderboard</p>
-            <h2>雀友排行榜</h2>
+            <h2>麻友排行榜</h2>
           </div>
           <div class="toolbar">
             <span id="syncStatus" class="sync-status">本地模式</span>
@@ -97,6 +112,7 @@
                 <th>场次</th>
                 <th>冠军</th>
                 <th>最佳单局</th>
+                <th>最差单局</th>
                 <th>平均收益</th>
               </tr>
             </thead>
@@ -110,7 +126,7 @@
           <div class="panel-header">
             <div>
               <p class="section-kicker">Trend</p>
-              <h2>财富走势</h2>
+              <h2>房租走势</h2>
             </div>
           </div>
           <canvas id="trendChart" width="900" height="360"></canvas>
