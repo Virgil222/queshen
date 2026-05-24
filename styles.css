@@ -478,6 +478,34 @@ canvas {
   height: 420px;
 }
 
+.trend-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-color: rgba(189, 47, 47, 0.35) rgba(92, 63, 42, 0.08);
+  scrollbar-width: thin;
+}
+
+.trend-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.trend-scroll::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(92, 63, 42, 0.08);
+}
+
+.trend-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(189, 47, 47, 0.35);
+}
+
+.trend-scroll canvas {
+  width: 100%;
+  max-width: none;
+}
+
 .bar-chart {
   display: grid;
   gap: 14px;

@@ -35,6 +35,7 @@ const elements = {
   topPlayerMeta: document.querySelector("#topPlayerMeta"),
   lowPlayerName: document.querySelector("#lowPlayerName"),
   lowPlayerMeta: document.querySelector("#lowPlayerMeta"),
+  trendScroll: document.querySelector("#trendScroll"),
   trendChart: document.querySelector("#trendChart"),
   matchList: document.querySelector("#matchList"),
   exportButton: document.querySelector("#exportButton"),
@@ -453,6 +454,8 @@ function renderTopPlayer(stats) {
 
 function renderTrendChart() {
   const canvas = elements.trendChart;
+  const trendDates = getTrendDates();
+  applyTrendCanvasWidth(canvas, trendDates.length);
   const { ctx, width, height } = setupTrendCanvas(canvas);
   ctx.clearRect(0, 0, width, height);
 
@@ -463,7 +466,6 @@ function renderTrendChart() {
 
   const padding = { top: 34, right: 82, bottom: 76, left: 64 };
   const series = buildTrendSeries();
-  const trendDates = getTrendDates();
   const allValues = series.flatMap((item) => item.points.map((point) => point.value));
   const minValue = Math.min(0, ...allValues);
   const maxValue = Math.max(0, ...allValues);
@@ -555,6 +557,7 @@ function renderTrendChart() {
   ctx.fillStyle = "#7a6a5c";
   ctx.font = "600 12px sans-serif";
   ctx.fillText("数值为累计积分", padding.left, height - 48);
+  scrollTrendToLatest();
 }
 
 function renderMatches() {
@@ -724,6 +727,19 @@ function drawEmptyCanvas(ctx, width, height, text) {
   ctx.textAlign = "center";
   ctx.fillText(text, width / 2, height / 2);
   ctx.textAlign = "left";
+}
+
+function applyTrendCanvasWidth(canvas, dateCount) {
+  const scrollWidth = elements.trendScroll?.clientWidth || canvas.parentElement?.clientWidth || 900;
+  const pointWidth = window.matchMedia("(max-width: 640px)").matches ? 76 : 96;
+  const baseWidth = window.matchMedia("(max-width: 640px)").matches ? 680 : 900;
+  const desiredWidth = Math.max(scrollWidth, baseWidth, 146 + Math.max(1, dateCount + 1) * pointWidth);
+  canvas.style.width = `${Math.ceil(desiredWidth)}px`;
+}
+
+function scrollTrendToLatest() {
+  if (!elements.trendScroll) return;
+  elements.trendScroll.scrollLeft = elements.trendScroll.scrollWidth;
 }
 
 function setupTrendCanvas(canvas) {
