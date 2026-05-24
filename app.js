@@ -36,11 +36,8 @@ const elements = {
   lowPlayerName: document.querySelector("#lowPlayerName"),
   lowPlayerMeta: document.querySelector("#lowPlayerMeta"),
   trendChart: document.querySelector("#trendChart"),
-  barChart: document.querySelector("#barChart"),
   matchList: document.querySelector("#matchList"),
   exportButton: document.querySelector("#exportButton"),
-  importInput: document.querySelector("#importInput"),
-  resetButton: document.querySelector("#resetButton"),
   syncStatus: document.querySelector("#syncStatus"),
   emptyStateTemplate: document.querySelector("#emptyStateTemplate"),
 };
@@ -143,29 +140,6 @@ elements.exportButton.addEventListener("click", () => {
   anchor.download = `雀神争霸赛-${new Date().toISOString().slice(0, 10)}.json`;
   anchor.click();
   URL.revokeObjectURL(url);
-});
-
-elements.importInput.addEventListener("change", async (event) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  try {
-    const imported = JSON.parse(await file.text());
-    validateImportedState(imported);
-    state.players = imported.players;
-    state.matches = imported.matches;
-    await persistAndRender();
-  } catch (error) {
-    alert(`导入失败：${error.message}`);
-  } finally {
-    elements.importInput.value = "";
-  }
-});
-
-elements.resetButton.addEventListener("click", async () => {
-  if (!confirm("确定要清空所有玩家和牌局记录吗？此操作不可撤销。")) return;
-  state.players = [];
-  state.matches = [];
-  await persistAndRender();
 });
 
 elements.scoreEntry.addEventListener("input", updateBalanceTip);
@@ -324,7 +298,6 @@ function render() {
   renderLeaderboard(stats);
   renderTopPlayer(stats);
   renderTrendChart(stats);
-  renderBarChart(stats);
   renderMatches();
   updateBalanceTip();
 }
@@ -479,8 +452,9 @@ function renderTrendChart() {
     return;
   }
 
-  const padding = { top: 30, right: 24, bottom: 54, left: 62 };
+  const padding = { top: 30, right: 24, bottom: 70, left: 62 };
   const series = buildTrendSeries();
+  const trendDates = getTrendDates();
   const allValues = series.flatMap((item) => item.points.map((point) => point.value));
   const minValue = Math.min(0, ...allValues);
   const maxValue = Math.max(0, ...allValues);
@@ -503,6 +477,15 @@ function renderTrendChart() {
     ctx.fillText(formatMoney(Math.round(value)), 10, y + 4);
   }
 
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#7a6a5c";
+  ctx.font = "12px sans-serif";
+  getAxisDateLabels(trendDates).forEach(({ date, pointIndex }) => {
+    const x = padding.left + (plotWidth / Math.max(1, trendDates.length)) * pointIndex;
+    ctx.fillText(formatAxisDate(date), x, height - 22);
+  });
+  ctx.textAlign = "left";
+
   series.forEach((item, index) => {
     ctx.strokeStyle = colors[index % colors.length];
     ctx.lineWidth = 3;
@@ -523,28 +506,7 @@ function renderTrendChart() {
   });
 
   ctx.fillStyle = "#7a6a5c";
-  ctx.fillText("时间从左到右，数值为累计输赢", padding.left, height - 18);
-}
-
-function renderBarChart(stats) {
-  elements.barChart.innerHTML = "";
-  if (!stats.length) {
-    elements.barChart.append(emptyState("暂无对比", "录入牌局后展示总输赢分布。"));
-    return;
-  }
-
-  const maxAbs = Math.max(1, ...stats.map((item) => Math.abs(item.total)));
-  stats.forEach((item) => {
-    const row = document.createElement("div");
-    row.className = "bar-row";
-    const width = Math.max(4, (Math.abs(item.total) / maxAbs) * 100);
-    row.innerHTML = `
-      <span class="bar-label">${escapeHtml(item.name)}</span>
-      <span class="bar-track"><span class="bar-fill ${item.total < 0 ? "loss" : ""}" style="width:${width}%"></span></span>
-      <span class="bar-value ${amountClass(item.total)}">${formatMoney(item.total)}</span>
-    `;
-    elements.barChart.append(row);
-  });
+  ctx.fillText("数值为累计输赢", padding.left, height - 44);
 }
 
 function renderMatches() {
@@ -631,17 +593,34 @@ function buildStats() {
 }
 
 function buildTrendSeries() {
-  const orderedMatches = [...state.matches].reverse();
+  const orderedMatches = getChronologicalMatches();
   return state.players.map((player) => {
     let total = 0;
     const points = [{ value: 0 }];
     orderedMatches.forEach((match) => {
-      const score = match.scores.find((item) => item.playerId === player.id);
+      const score = getParticipantScores(match).find((item) => item.playerId === player.id);
       total += score?.amount || 0;
       points.push({ value: total, date: match.date });
     });
     return { name: player.name, points };
   });
+}
+
+function getTrendDates() {
+  return getChronologicalMatches().map((match) => match.date).filter(Boolean);
+}
+
+function getChronologicalMatches() {
+  return [...state.matches].sort((a, b) => getMatchSortTime(a) - getMatchSortTime(b));
+}
+
+function getAxisDateLabels(dates) {
+  if (dates.length <= 6) {
+    return dates.map((date, index) => ({ date, pointIndex: index + 1 }));
+  }
+
+  const labelIndexes = new Set([0, Math.floor((dates.length - 1) / 2), dates.length - 1]);
+  return [...labelIndexes].map((index) => ({ date: dates[index], pointIndex: index + 1 }));
 }
 
 function getScoreInputs() {
@@ -723,6 +702,10 @@ function amountClass(value) {
 function formatDate(value) {
   if (!value) return "未填写日期";
   return new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit", weekday: "short" }).format(new Date(value));
+}
+
+function formatAxisDate(value) {
+  return new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit" }).format(new Date(value));
 }
 
 function getMatchSortTime(match) {
