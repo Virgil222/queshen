@@ -28,6 +28,8 @@ const elements = {
   leaderboardBody: document.querySelector("#leaderboardBody"),
   topPlayerName: document.querySelector("#topPlayerName"),
   topPlayerMeta: document.querySelector("#topPlayerMeta"),
+  lowPlayerName: document.querySelector("#lowPlayerName"),
+  lowPlayerMeta: document.querySelector("#lowPlayerMeta"),
   trendChart: document.querySelector("#trendChart"),
   barChart: document.querySelector("#barChart"),
   matchList: document.querySelector("#matchList"),
@@ -371,9 +373,16 @@ function renderLeaderboard(stats) {
 
 function renderTopPlayer(stats) {
   const top = stats[0];
+  const low = [...stats]
+    .filter((item) => item.games > 0)
+    .sort((a, b) => a.winRate - b.winRate || a.total - b.total || a.champions - b.champions)[0];
   elements.topPlayerName.textContent = top ? top.name : "暂无数据";
   elements.topPlayerMeta.textContent = top
     ? `总输赢 ${formatMoney(top.total)} · 胜率 ${formatPercent(top.winRate)}`
+    : "录入一场牌局后生成";
+  elements.lowPlayerName.textContent = low ? low.name : "暂无数据";
+  elements.lowPlayerMeta.textContent = low
+    ? `胜率 ${formatPercent(low.winRate)} · 总输赢 ${formatMoney(low.total)}`
     : "录入一场牌局后生成";
 }
 

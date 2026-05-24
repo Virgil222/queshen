@@ -84,24 +84,22 @@ h2 {
   font-size: 22px;
 }
 
-.hero-text {
-  max-width: 720px;
-  margin: 16px 0 0;
-  color: rgba(255, 247, 236, 0.82);
-  font-size: 18px;
-  line-height: 1.8;
-}
-
 .hero-card {
   display: flex;
   min-height: 210px;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 18px;
   padding: 28px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(16px);
+}
+
+.hero-rank-item + .hero-rank-item {
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .hero-card span,
@@ -110,9 +108,10 @@ h2 {
 }
 
 .hero-card strong {
-  margin: 12px 0 8px;
+  display: block;
+  margin: 10px 0 6px;
   color: #fff;
-  font-size: 34px;
+  font-size: 30px;
 }
 
 .summary-grid {
